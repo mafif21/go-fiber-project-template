@@ -51,7 +51,7 @@ func (s CategoryServiceImpl) GetById(categoryId string) (*dtos.CategoryResponse,
 	category, err := s.CategoryRepository.FindById(categoryId)
 	if err != nil {
 		s.Log.Warnf("failed get data by id : %+v", err)
-		return nil, fiber.ErrNotFound
+		return nil, fiber.NewError(fiber.StatusNotFound, "data not found")
 	}
 
 	return converters.CategoryToResponse(category), nil

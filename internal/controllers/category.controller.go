@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
+	"go-fiber-project-template/internal/config"
 	"go-fiber-project-template/internal/model/dtos"
 	"go-fiber-project-template/internal/services"
 )
@@ -27,9 +28,10 @@ func NewCategoryControllerImpl(categoryService services.CategoryService, log *lo
 
 func (c CategoryControllerImpl) Get(ctx *fiber.Ctx) error {
 	categories, err := c.CategoryService.Get()
+
 	if err != nil {
-		c.Log.Warnf("failed to get all category : %+v", err)
-		return err
+		c.Log.Warnf("failed to get all categoies : %v", err)
+		return config.ErrorHandler(ctx, c.Log, err)
 	}
 
 	return ctx.JSON(&dtos.WebResponse[[]dtos.CategoryResponse]{
@@ -41,9 +43,10 @@ func (c CategoryControllerImpl) Get(ctx *fiber.Ctx) error {
 
 func (c CategoryControllerImpl) GetById(ctx *fiber.Ctx) error {
 	category, err := c.CategoryService.GetById(ctx.Params("categoryId"))
+
 	if err != nil {
-		c.Log.Warnf("failed to get detail category : %+v", err)
-		return err
+		c.Log.Warnf("failed to get detail category : %v", err)
+		return config.ErrorHandler(ctx, c.Log, err)
 	}
 
 	return ctx.JSON(&dtos.WebResponse[*dtos.CategoryResponse]{
@@ -58,13 +61,13 @@ func (c CategoryControllerImpl) Create(ctx *fiber.Ctx) error {
 
 	if err := ctx.BodyParser(&request); err != nil {
 		c.Log.Warnf("failed to parse request body : %+v", err)
-		return fiber.ErrBadRequest
+		return config.ErrorHandler(ctx, c.Log, err)
 	}
 
 	category, err := c.CategoryService.Create(request)
 	if err != nil {
-		c.Log.Warnf("failed to create new category : %+v", err)
-		return err
+		c.Log.Warnf("failed to create new category : %v", err)
+		return config.ErrorHandler(ctx, c.Log, err)
 	}
 
 	return ctx.JSON(&dtos.WebResponse[*dtos.CategoryResponse]{
@@ -79,15 +82,15 @@ func (c CategoryControllerImpl) Update(ctx *fiber.Ctx) error {
 
 	if err := ctx.BodyParser(&request); err != nil {
 		c.Log.Warnf("failed to parse request body : %+v", err)
-		return fiber.ErrBadRequest
+		return config.ErrorHandler(ctx, c.Log, err)
 	}
 
 	request.ID = ctx.Params("categoryId")
 
 	category, err := c.CategoryService.Update(request)
 	if err != nil {
-		c.Log.Warnf("failed to update category : %+v", err)
-		return err
+		c.Log.Warnf("failed to update existing category : %+v", err)
+		return config.ErrorHandler(ctx, c.Log, err)
 	}
 
 	return ctx.JSON(&dtos.WebResponse[*dtos.CategoryResponse]{
@@ -100,8 +103,8 @@ func (c CategoryControllerImpl) Update(ctx *fiber.Ctx) error {
 func (c CategoryControllerImpl) Delete(ctx *fiber.Ctx) error {
 	err := c.CategoryService.Delete(ctx.Params("categoryId"))
 	if err != nil {
-		c.Log.Warnf("failed to delete category : %+v", err)
-		return err
+		c.Log.Warnf("failed to delete existing category : %v", err)
+		return config.ErrorHandler(ctx, c.Log, err)
 	}
 
 	return ctx.JSON(&dtos.WebResponse[*dtos.CategoryResponse]{
