@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/spf13/viper"
 )
 
@@ -10,7 +11,10 @@ func NewFiber(config *viper.Viper) *fiber.App {
 		AppName:      config.GetString("app.name"),
 		ErrorHandler: NewErrorHandler(),
 		Prefork:      config.GetBool("web.prefork"),
+		BodyLimit:    2 * 1024 * 1024,
 	})
+
+	app.Use(cors.New())
 
 	return app
 }

@@ -11,16 +11,17 @@ type RouteConfig struct {
 }
 
 func (c *RouteConfig) Setup() {
-	c.RouteGuest()
-	c.RouteAuth()
+	api := c.App.Group("/api")
+	c.RouteGuest(api)
+	c.RouteAuth(api)
 }
 
-func (c *RouteConfig) RouteGuest() {
-	c.App.Get("/api/category", c.CategoryController.Get)
-	c.App.Get("/api/category/:categoryId", c.CategoryController.GetById)
-	c.App.Post("/api/category", c.CategoryController.Create)
-	c.App.Put("/api/category/:categoryId/edit", c.CategoryController.Update)
-	c.App.Delete("/api/category/:categoryId/delete", c.CategoryController.Delete)
+func (c *RouteConfig) RouteGuest(api fiber.Router) {
+	api.Get("/category", c.CategoryController.Get)
+	api.Get("/category/:categoryId", c.CategoryController.GetById)
+	api.Post("/category", c.CategoryController.Create)
+	api.Put("/category/:categoryId/edit", c.CategoryController.Update)
+	api.Delete("/category/:categoryId/delete", c.CategoryController.Delete)
 }
 
-func (c *RouteConfig) RouteAuth() {}
+func (c *RouteConfig) RouteAuth(api fiber.Router) {}

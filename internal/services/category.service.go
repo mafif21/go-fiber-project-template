@@ -36,7 +36,7 @@ func (s CategoryServiceImpl) Get() ([]dtos.CategoryResponse, error) {
 	datas, err := s.CategoryRepository.FindAll()
 	if err != nil {
 		s.Log.Warnf("failed get all data categories : %+v", err)
-		return nil, fiber.ErrInternalServerError
+		return nil, fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
 	response := make([]dtos.CategoryResponse, len(datas))
@@ -60,7 +60,7 @@ func (s CategoryServiceImpl) GetById(categoryId string) (*dtos.CategoryResponse,
 func (s CategoryServiceImpl) Create(request *dtos.CategoryCreateRequest) (*dtos.CategoryResponse, error) {
 	if err := s.Validate.Struct(request); err != nil {
 		s.Log.Warnf("invalid request body : %+v", err)
-		return nil, fiber.ErrBadRequest
+		return nil, fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
 	contact := &entities.Category{
@@ -70,7 +70,7 @@ func (s CategoryServiceImpl) Create(request *dtos.CategoryCreateRequest) (*dtos.
 	newContact, err := s.CategoryRepository.CreateData(contact)
 	if err != nil {
 		s.Log.Warnf("failed to create new data : %+v", err)
-		return nil, fiber.ErrInternalServerError
+		return nil, fiber.NewError(fiber.StatusBadRequest, "failed create to create new data")
 	}
 
 	return converters.CategoryToResponse(newContact), nil
@@ -79,13 +79,13 @@ func (s CategoryServiceImpl) Create(request *dtos.CategoryCreateRequest) (*dtos.
 func (s CategoryServiceImpl) Update(request *dtos.CategoryUpdateRequest) (*dtos.CategoryResponse, error) {
 	if err := s.Validate.Struct(request); err != nil {
 		s.Log.Warnf("invalid request body : %+v", err)
-		return nil, fiber.ErrBadRequest
+		return nil, fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
 	foundCategory, err := s.CategoryRepository.FindById(request.ID)
 	if err != nil {
 		s.Log.Warnf("failed get data by id : %+v", err)
-		return nil, fiber.ErrNotFound
+		return nil, fiber.NewError(fiber.StatusNotFound, "data not found")
 	}
 
 	foundCategory.Name = request.Name
@@ -93,7 +93,7 @@ func (s CategoryServiceImpl) Update(request *dtos.CategoryUpdateRequest) (*dtos.
 	updatedCategory, err := s.CategoryRepository.UpdateData(foundCategory)
 	if err != nil {
 		s.Log.Warnf("failed to update data : %+v", err)
-		return nil, fiber.ErrInternalServerError
+		return nil, fiber.NewError(fiber.StatusBadRequest, "failed to update category")
 	}
 
 	return converters.CategoryToResponse(updatedCategory), nil
@@ -103,13 +103,13 @@ func (s CategoryServiceImpl) Delete(categoryId string) error {
 	foundCategory, err := s.CategoryRepository.FindById(categoryId)
 	if err != nil {
 		s.Log.Warnf("failed get data by id : %+v", err)
-		return fiber.ErrNotFound
+		return fiber.NewError(fiber.StatusNotFound, "data not found")
 	}
 
 	err = s.CategoryRepository.DeleteData(foundCategory)
 	if err != nil {
 		s.Log.Warnf("failed to delete data : %+v", err)
-		return fiber.ErrInternalServerError
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
 	return nil
