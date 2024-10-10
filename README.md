@@ -1,2 +1,12 @@
-# go-fiber-project-template
-Golang Rest API Template Using Fiber
+
+# GO FIBER REST API TEMPLATE
+
+## Setup
+
+How to Run
+
+- Install this library
+```
+go get https://github.com/mafif21/nodejs-restapi-template.git
+```
+
