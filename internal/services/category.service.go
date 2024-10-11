@@ -20,8 +20,8 @@ type CategoryService interface {
 
 type CategoryServiceImpl struct {
 	Validate           *validator.Validate
-	CategoryRepository repositories.CategoryRepository
 	Log                *logrus.Logger
+	CategoryRepository repositories.CategoryRepository
 }
 
 func NewCategoryServiceImpl(validate *validator.Validate, categoryRepository repositories.CategoryRepository, log *logrus.Logger) CategoryService {
@@ -106,8 +106,7 @@ func (s CategoryServiceImpl) Delete(categoryId string) error {
 		return fiber.NewError(fiber.StatusNotFound, "data not found")
 	}
 
-	err = s.CategoryRepository.DeleteData(foundCategory)
-	if err != nil {
+	if err := s.CategoryRepository.DeleteData(foundCategory); err != nil {
 		s.Log.Warnf("failed to delete data : %+v", err)
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
