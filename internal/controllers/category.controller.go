@@ -10,11 +10,11 @@ import (
 )
 
 type CategoryController interface {
-	Get(ctx *fiber.Ctx) error
-	GetById(ctx *fiber.Ctx) error
-	Create(ctx *fiber.Ctx) error
-	Update(ctx *fiber.Ctx) error
-	Delete(ctx *fiber.Ctx) error
+	GetCategory(ctx *fiber.Ctx) error
+	GetCategoryById(ctx *fiber.Ctx) error
+	CreateCategory(ctx *fiber.Ctx) error
+	UpdateCategory(ctx *fiber.Ctx) error
+	DeleteCategory(ctx *fiber.Ctx) error
 }
 
 type CategoryControllerImpl struct {
@@ -26,7 +26,7 @@ func NewCategoryControllerImpl(categoryService services.CategoryService, log *lo
 	return &CategoryControllerImpl{CategoryService: categoryService, Log: log}
 }
 
-func (c CategoryControllerImpl) Get(ctx *fiber.Ctx) error {
+func (c CategoryControllerImpl) GetCategory(ctx *fiber.Ctx) error {
 	categories, err := c.CategoryService.Get()
 
 	if err != nil {
@@ -41,7 +41,7 @@ func (c CategoryControllerImpl) Get(ctx *fiber.Ctx) error {
 	})
 }
 
-func (c CategoryControllerImpl) GetById(ctx *fiber.Ctx) error {
+func (c CategoryControllerImpl) GetCategoryById(ctx *fiber.Ctx) error {
 	category, err := c.CategoryService.GetById(ctx.Params("categoryId"))
 
 	if err != nil {
@@ -56,7 +56,7 @@ func (c CategoryControllerImpl) GetById(ctx *fiber.Ctx) error {
 	})
 }
 
-func (c CategoryControllerImpl) Create(ctx *fiber.Ctx) error {
+func (c CategoryControllerImpl) CreateCategory(ctx *fiber.Ctx) error {
 	request := new(dtos.CategoryCreateRequest)
 
 	if err := ctx.BodyParser(&request); err != nil {
@@ -77,7 +77,7 @@ func (c CategoryControllerImpl) Create(ctx *fiber.Ctx) error {
 	})
 }
 
-func (c CategoryControllerImpl) Update(ctx *fiber.Ctx) error {
+func (c CategoryControllerImpl) UpdateCategory(ctx *fiber.Ctx) error {
 	request := new(dtos.CategoryUpdateRequest)
 
 	if err := ctx.BodyParser(&request); err != nil {
@@ -100,7 +100,7 @@ func (c CategoryControllerImpl) Update(ctx *fiber.Ctx) error {
 	})
 }
 
-func (c CategoryControllerImpl) Delete(ctx *fiber.Ctx) error {
+func (c CategoryControllerImpl) DeleteCategory(ctx *fiber.Ctx) error {
 	err := c.CategoryService.Delete(ctx.Params("categoryId"))
 	if err != nil {
 		c.Log.Warnf("failed to delete existing category : %v", err)
