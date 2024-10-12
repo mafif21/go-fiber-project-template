@@ -51,7 +51,10 @@ func NewDB(viper *viper.Viper, log *logrus.Logger) *gorm.DB {
 		log.Fatalf("failed to connect database: %v", err)
 	}
 
-	dbOpen.AutoMigrate(&entities.Category{})
+	err = dbOpen.AutoMigrate(&entities.Category{}, &entities.Product{})
+	if err != nil {
+		log.Fatalf("failed to migrate database: %v", err)
+	}
 
 	connection, err := dbOpen.DB()
 	if err != nil {

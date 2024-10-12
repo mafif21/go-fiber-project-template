@@ -17,3 +17,8 @@ type CategoryResponse struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
+
+type CategorySearchRequest struct {
+	Name string `json:"name" validate:"max=100"`
+	*SearchConf
+}

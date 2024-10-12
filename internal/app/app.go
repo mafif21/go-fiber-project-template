@@ -25,9 +25,14 @@ func StartApp(config *StartAppConfig) {
 	categoryservice := services.NewCategoryServiceImpl(config.Validator, categoryRepository, config.Log)
 	categoryController := controllers.NewCategoryControllerImpl(categoryservice, config.Log)
 
+	productRepository := repositories.NewProductRepositoryImpl(config.DB, config.Log)
+	productService := services.NewProductServiceImpl(config.Validator, config.Log, productRepository)
+	productController := controllers.NewProductControllerImpl(config.Log, productService)
+
 	routeConfig := route.RouteConfig{
 		App:                config.App,
 		CategoryController: categoryController,
+		ProductController:  productController,
 	}
 
 	routeConfig.Setup()

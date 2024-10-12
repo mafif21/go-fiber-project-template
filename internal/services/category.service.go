@@ -11,7 +11,7 @@ import (
 )
 
 type CategoryService interface {
-	Get() ([]dtos.CategoryResponse, error)
+	Get(request *dtos.CategorySearchRequest) ([]dtos.CategoryResponse, int64, error)
 	GetById(categoryId string) (*dtos.CategoryResponse, error)
 	Create(request *dtos.CategoryCreateRequest) (*dtos.CategoryResponse, error)
 	Update(request *dtos.CategoryUpdateRequest) (*dtos.CategoryResponse, error)
@@ -32,11 +32,16 @@ func NewCategoryServiceImpl(validate *validator.Validate, categoryRepository rep
 	}
 }
 
-func (s CategoryServiceImpl) Get() ([]dtos.CategoryResponse, error) {
-	datas, err := s.CategoryRepository.FindAll()
+func (s CategoryServiceImpl) Get(request *dtos.CategorySearchRequest) ([]dtos.CategoryResponse, int64, error) {
+	if err := s.Validate.Struct(request); err != nil {
+		s.Log.WithError(err).Error("error validating request body")
+		return nil, 0, fiber.ErrBadRequest
+	}
+
+	datas, total, err := s.CategoryRepository.FindAll(request)
 	if err != nil {
 		s.Log.Warnf("failed get all data categories : %+v", err)
-		return nil, fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		return nil, 0, fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
 	response := make([]dtos.CategoryResponse, len(datas))
@@ -44,7 +49,7 @@ func (s CategoryServiceImpl) Get() ([]dtos.CategoryResponse, error) {
 		response[i] = *converters.CategoryToResponse(&data)
 	}
 
-	return response, nil
+	return response, total, nil
 }
 
 func (s CategoryServiceImpl) GetById(categoryId string) (*dtos.CategoryResponse, error) {

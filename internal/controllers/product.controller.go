@@ -19,11 +19,18 @@ type ProductController interface {
 
 type ProductControllerImpl struct {
 	Log            *logrus.Logger
-	productService services.ProductService
+	ProductService services.ProductService
+}
+
+func NewProductControllerImpl(log *logrus.Logger, productService services.ProductService) ProductController {
+	return &ProductControllerImpl{
+		Log:            log,
+		ProductService: productService,
+	}
 }
 
 func (c ProductControllerImpl) GetProduct(ctx *fiber.Ctx) error {
-	products, err := c.productService.Get()
+	products, err := c.ProductService.Get()
 	if err != nil {
 		c.Log.Warnf("failed to get all products : %v", err)
 		return config.ErrorHandler(ctx, c.Log, err)
@@ -39,7 +46,7 @@ func (c ProductControllerImpl) GetProduct(ctx *fiber.Ctx) error {
 func (c ProductControllerImpl) GetProductById(ctx *fiber.Ctx) error {
 	productId := ctx.Params("productId")
 
-	product, err := c.productService.GetById(productId)
+	product, err := c.ProductService.GetById(productId)
 	if err != nil {
 		c.Log.Warnf("failed to get detail product : %v", err)
 		return config.ErrorHandler(ctx, c.Log, err)
@@ -60,7 +67,7 @@ func (c ProductControllerImpl) CreateProduct(ctx *fiber.Ctx) error {
 		return config.ErrorHandler(ctx, c.Log, err)
 	}
 
-	newProduct, err := c.productService.Create(request)
+	newProduct, err := c.ProductService.Create(request)
 	if err != nil {
 		c.Log.Warnf("failed to create new product : %v", err)
 		return config.ErrorHandler(ctx, c.Log, err)
@@ -84,7 +91,7 @@ func (c ProductControllerImpl) UpdateProduct(ctx *fiber.Ctx) error {
 	productId := ctx.Params("productId")
 	request.ID = productId
 
-	updatedProduct, err := c.productService.Update(request)
+	updatedProduct, err := c.ProductService.Update(request)
 	if err != nil {
 		c.Log.Warnf("failed to update existing product : %+v", err)
 		return config.ErrorHandler(ctx, c.Log, err)
@@ -100,7 +107,7 @@ func (c ProductControllerImpl) UpdateProduct(ctx *fiber.Ctx) error {
 func (c ProductControllerImpl) DeleteProduct(ctx *fiber.Ctx) error {
 	productId := ctx.Params("productId")
 
-	err := c.productService.Delete(productId)
+	err := c.ProductService.Delete(productId)
 	if err != nil {
 		c.Log.Warnf("failed to delete existing product : %v", err)
 		return config.ErrorHandler(ctx, c.Log, err)

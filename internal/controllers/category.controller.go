@@ -7,6 +7,7 @@ import (
 	"go-fiber-project-template/internal/config"
 	"go-fiber-project-template/internal/model/dtos"
 	"go-fiber-project-template/internal/services"
+	"math"
 )
 
 type CategoryController interface {
@@ -27,17 +28,32 @@ func NewCategoryControllerImpl(categoryService services.CategoryService, log *lo
 }
 
 func (c CategoryControllerImpl) GetCategory(ctx *fiber.Ctx) error {
-	categories, err := c.CategoryService.Get()
+	request := &dtos.CategorySearchRequest{
+		Name: ctx.Query("name", ""),
+		SearchConf: &dtos.SearchConf{
+			Page: ctx.QueryInt("page", 1),
+			Size: ctx.QueryInt("size", 10),
+		},
+	}
 
+	categories, total, err := c.CategoryService.Get(request)
 	if err != nil {
 		c.Log.Warnf("failed to get all categoies : %v", err)
 		return config.ErrorHandler(ctx, c.Log, err)
+	}
+
+	pagination := &dtos.PageMetadata{
+		Page:      request.Page,
+		Size:      request.Size,
+		TotalItem: total,
+		TotalPage: int64(math.Ceil(float64(total) / float64(request.Size))),
 	}
 
 	return ctx.JSON(&dtos.WebResponse[[]dtos.CategoryResponse]{
 		Status:  fiber.StatusOK,
 		Message: "success get all categories",
 		Data:    categories,
+		Paging:  pagination,
 	})
 }
 

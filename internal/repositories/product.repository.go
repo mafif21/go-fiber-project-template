@@ -20,6 +20,15 @@ type ProductRepositoryImpl struct {
 	Log *logrus.Logger
 }
 
+func NewProductRepositoryImpl(db *gorm.DB, log *logrus.Logger) ProductRepository {
+	return &ProductRepositoryImpl{
+		GlobalRepositoryImpl: GlobalRepositoryImpl[entities.Product]{
+			DB: db,
+		},
+		Log: log,
+	}
+}
+
 func (r *ProductRepositoryImpl) FindAll() ([]entities.Product, error) {
 	var products []entities.Product
 

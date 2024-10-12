@@ -24,8 +24,10 @@ type ProductServiceImpl struct {
 	ProductRepository repositories.ProductRepository
 }
 
-func NewProductServiceImpl(productRepository repositories.ProductRepository) ProductService {
+func NewProductServiceImpl(validate *validator.Validate, log *logrus.Logger, productRepository repositories.ProductRepository) ProductService {
 	return &ProductServiceImpl{
+		Validate:          validate,
+		Log:               log,
 		ProductRepository: productRepository,
 	}
 }
